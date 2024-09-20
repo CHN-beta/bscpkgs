@@ -16,6 +16,7 @@
 , gcc7
 , wrapCCWith
 , linuxHeaders
+, config
 }:
 
 # The distribution of intel packages is a mess. We are doing the installation
@@ -398,7 +399,7 @@ let
         echo "-L${intel-compiler-shared}/lib" >> $out/nix-support/cc-ldflags
         echo "-L${cc}/lib" >> $out/nix-support/cc-ldflags
 
-        cp ${mygcc}/nix-support/cc-cflags-before $out/nix-support
+        echo "-march=${config.oneapiArch} -mtune=${config.oneapiArch}" >> $out/nix-support/cc-cflags-before
 
         # Need the gcc in the path
         echo 'export "PATH=${mygcc}/bin:$PATH"' >> $out/nix-support/cc-wrapper-hook
