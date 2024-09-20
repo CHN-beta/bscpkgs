@@ -200,6 +200,7 @@ let
       libxml2
       hwloc
       stdenv.cc.cc.lib
+      zlib
     ];
 
     nativeBuildInputs = [ autoPatchelfHook ];
@@ -396,6 +397,8 @@ let
         echo "-L${mygcc.cc.lib}/lib" >> $out/nix-support/cc-ldflags
         echo "-L${intel-compiler-shared}/lib" >> $out/nix-support/cc-ldflags
         echo "-L${cc}/lib" >> $out/nix-support/cc-ldflags
+
+        cp ${mygcc}/nix-support/cc-cflags-before $out/nix-support
 
         # Need the gcc in the path
         echo 'export "PATH=${mygcc}/bin:$PATH"' >> $out/nix-support/cc-wrapper-hook
