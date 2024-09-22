@@ -32,10 +32,10 @@
 let
 
   v = {
-    hpckit   = "2023.1.0";
-    compiler = "2023.1.0";
-    tbb      = "2021.9.0";
-    mpi      = "2021.9.0";
+    hpckit   = "2023.2.0";
+    compiler = "2023.2.0";
+    tbb      = "2021.10.0";
+    mpi      = "2021.10.0";
   };
 
   aptPackageIndex = stdenv.mkDerivation {
@@ -208,7 +208,7 @@ let
     phases = [ "installPhase" "fixupPhase" ];
     dontStrip = true;
 
-    autoPatchelfIgnoreMissingDeps = [ "libsycl.so.6" ];
+    autoPatchelfIgnoreMissingDeps = [ "libsycl.so.6" "libze_loader.so.1" ];
 
     installPhase = ''
       mkdir -p $out/{bin,lib,include}
@@ -314,6 +314,11 @@ let
       "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-common-${version}"
       "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-runtime-${version}"
       "intel-oneapi-compiler-dpcpp-cpp-classic-fortran-shared-runtime-${version}"
+
+      # fortran ifx fpp
+      "intel-oneapi-compiler-fortran-${version}"
+      "intel-oneapi-compiler-fortran-common-${version}"
+      "intel-oneapi-compiler-fortran-runtime-${version}"
     ];
     # From https://aur.archlinux.org/packages/intel-oneapi-compiler:
     # - intel-oneapi-compiler-cpp-eclipse-cfg-2023.0.0-25370_all.deb
@@ -338,6 +343,7 @@ let
     # - intel-oneapi-openmp-common-2023.0.0-2023.0.0-25370_all.deb
 
     buildInputs = [
+      intel-mpi
       intel-compiler-shared
       rsync
       libffi_3_3
@@ -353,6 +359,7 @@ let
     phases = [ "installPhase" "fixupPhase" ];
 
     dontStrip = true;
+    langFortran = true;
 
     installPhase = ''
       mkdir -p $out/{bin,lib}
@@ -382,6 +389,8 @@ let
         # Manuals
         rsync -a documentation/en/man/common/ $out/share/man/
       popd
+
+      ln -s $out/lib $out/lib_lin
     '';
   };
 
@@ -417,12 +426,14 @@ let
     extraBuild = ''
       wrap icx  $wrapper $ccPath/icx
       wrap icpx $wrapper $ccPath/icpx
+      wrap ifx $wrapper $ccPath/ifx
       echo "-isystem ${cc}/include/icx" >> $out/nix-support/cc-cflags
       echo "--gcc-toolchain=${mygcc.cc}" >> $out/nix-support/cc-cflags
     '';
     extraInstall = ''
       export named_cc="icx"
       export named_cxx="icpx"
+      export named_fc=ifx
     '';
   };
 
