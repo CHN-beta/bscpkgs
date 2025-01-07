@@ -408,7 +408,8 @@ let
         echo "-L${intel-compiler-shared}/lib" >> $out/nix-support/cc-ldflags
         echo "-L${cc}/lib" >> $out/nix-support/cc-ldflags
 
-        echo "-march=${config.oneapiArch} -mtune=${config.oneapiArch}" >> $out/nix-support/cc-cflags-before
+        # leave -mtune decided by the compiler (should be same as march), since ifx doesn't support -mtune=znver4
+        echo "-march=${config.oneapiArch}" >> $out/nix-support/cc-cflags-before
 
         # Need the gcc in the path
         echo 'export "PATH=${mygcc}/bin:$PATH"' >> $out/nix-support/cc-wrapper-hook
