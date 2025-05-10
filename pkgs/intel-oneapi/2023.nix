@@ -199,6 +199,7 @@ let
       libffi_3_3
       libelf
       libxml2
+      zlib
       hwloc
       stdenv.cc.cc.lib
       zlib

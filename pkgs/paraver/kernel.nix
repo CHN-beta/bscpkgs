@@ -4,14 +4,15 @@
 , boost
 , libxml2
 , xml2
-, wxGTK30
+, wxGTK32
 , autoconf
 , automake
 , pkg-config
+, zlib
 }:
 
 let
-  wx = wxGTK30;
+  wx = wxGTK32;
 in
 stdenv.mkDerivation rec {
   pname = "paraver-kernel";
@@ -51,5 +52,6 @@ stdenv.mkDerivation rec {
     autoconf
     automake
     pkg-config
+    zlib
   ];
 }

@@ -17,9 +17,9 @@
 , cachelineBytes ? 64
 , enableGlibcxxDebug ? false
 , useGit ? false
-, gitUrl ? "ssh://git@bscpm03.bsc.es/nanos6/nanos6"
+, gitUrl ? "ssh://git@bscpm04.bsc.es/nanos6/nanos6"
 , gitBranch ? "master"
-, gitCommit ? "4fdddf67b573fbe624bf64b92c0a9b4e344b9dd3"
+, gitCommit ? "9f54c988e0a8b9c011d9d526acdb8d76f18fcae4"
 }:
 
 assert enableJemalloc -> (jemallocNanos6 != null);
@@ -28,17 +28,13 @@ with lib;
 
 let
   release = rec {
-    version = "4.0";
+    version = "4.2";
     src = fetchFromGitHub {
       owner = "bsc-pm";
       repo = "nanos6";
       rev = "version-${version}";
-      hash = "sha256-o2j7xNufdjcWykbwDDHQYxYCs4kpyQvJnuFyeXYZULw=";
+      hash = "sha256-tBrRGLCjSFYdmVGPAC2DzYY6HJyZGUOMeykujafn7+4=";
     };
-    patches = [
-      # https://pm.bsc.es/gitlab/nanos6/nanos6/-/issues/185
-      ./0001-Add-missing-cstdint-include.patch
-    ];
   };
 
   git = rec {
@@ -52,7 +48,7 @@ let
 
   source = if (useGit) then git else release;
 in
-  stdenv.mkDerivation (source // rec {
+  stdenv.mkDerivation (source // {
     pname = "nanos6";
 
     prePatch = ''
@@ -66,7 +62,7 @@ in
       export CACHELINE_WIDTH=${toString cachelineBytes}
       ./autogen.sh
     '' + lib.optionalString (useGit) ''
-      export NANOS6_GIT_VERSION=${src.rev}
+      export NANOS6_GIT_VERSION=${gitCommit}
       export NANOS6_GIT_BRANCH=${gitBranch}
     '';
 
