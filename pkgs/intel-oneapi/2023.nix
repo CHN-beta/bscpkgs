@@ -12,12 +12,11 @@
 , autoPatchelfHook
 , symlinkJoin
 , libfabric
-, gcc
-, gcc7
+, gcc13
 , wrapCCWith
 , linuxHeaders
 , config
-}:
+}: let gcc = gcc13; in
 
 # The distribution of intel packages is a mess. We are doing the installation
 # based on the .deb metapackage "intel-hpckit", and follow de dependencies,
@@ -384,7 +383,7 @@ let
           rsync -a compiler/include/ $out/include/ # Intrinsics for icc
           rsync -a include/ $out/include/
           chmod +w $out/include
-          ln -s $out/lib/clang/16.0.0/include/ $out/include/icx # For icx
+          ln -s $out/lib/clang/17/include/ $out/include/icx # For icx
         popd
 
         # Manuals
@@ -392,6 +391,9 @@ let
       popd
 
       ln -s $out/lib $out/lib_lin
+
+      chmod +w $out/lib/x64
+      rm $out/lib/x64/libintelocl_emu.so
     '';
   };
 
