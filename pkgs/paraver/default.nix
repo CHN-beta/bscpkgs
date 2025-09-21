@@ -1,5 +1,6 @@
 {
   stdenv
+, fetchFromGitHub
 , autoreconfHook
 , boost
 , libxml2
@@ -18,13 +19,22 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "wxparaver";
-  version = "4.11.2";
+  version = "4.12.0";
 
-  src = builtins.fetchGit {
-    url = "https://github.com/bsc-performance-tools/wxparaver.git";
-    rev = "129e6b4a4f061e5a319049db8db1620f5de3bd70"; # v4.11.2 (missing tag)
-    ref = "master";
+  src = fetchFromGitHub {
+    owner = "bsc-performance-tools";
+    repo = "wxparaver";
+    rev = "v${version}";
+    sha256 = "sha256-YsO5gsuEFQdki3lQudEqgo5WXOt/fPdvNw5OxZQ86Zo=";
   };
+
+  patches = [
+    ./do-not-steal-focus-on-redraw.patch
+
+    # Fix for boost >=1.87 (thanks to gamezelda)
+    # https://aur.archlinux.org/cgit/aur.git/commit/?h=wxparaver&id=b0dcd08c472536e0a1a3cc1dfbc4c77d9f5e0d47
+    ./fix-boost-87.patch
+  ];
 
   hardeningDisable = [ "all" ];
 

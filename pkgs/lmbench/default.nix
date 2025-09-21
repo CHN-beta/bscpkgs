@@ -1,35 +1,41 @@
 {
   lib,
   stdenv,
+  libtirpc,
   fetchFromGitHub
 }:
 
 stdenv.mkDerivation rec {
   pname = "lmbench";
-  version = "701c6c35";
+  version = "941a0dcc";
 
   # We use the intel repo as they have fixed some problems
   src = fetchFromGitHub {
     owner = "intel";
     repo = pname;
-    rev = "701c6c35b0270d4634fb1dc5272721340322b8ed";
-    sha256 = "0sf6zk03knkardsfd6qx7drpm56nhg53n885cylkggk83r38idyr";
+    rev = "941a0dcc0e7bdd9bb0dee05d7f620e77da8c43af";
+    sha256 = "sha256-SzwplRBO3V0R3m3p15n71ivYBMGoLsajFK2TapYxdqk=";
   };
-
-  postUnpack = ''
-    export sourceRoot="$sourceRoot/src"
-  '';
 
   postPatch = ''
     sed -i "s@/bin/rm@rm@g" $(find . -name Makefile)
   '';
+
+  buildInputs = [ libtirpc ];
+  patches = [ ./fix-install.patch ./gcc-14.patch ];
 
   hardeningDisable = [ "all" ];
 
   enableParallelBuilding = false;
 
   preBuild = ''
-    makeFlagsArray+=(BASE=$out)
+    makeFlagsArray+=(
+      -C src
+      BASE=$out
+      CFLAGS=-Wno-implicit-int
+      CPPFLAGS=-I${libtirpc.dev}/include/tirpc
+      LDFLAGS=-ltirpc
+    )
   '';
 
   meta = {

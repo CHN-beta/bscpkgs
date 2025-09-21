@@ -1,6 +1,5 @@
 { stdenv
 , fetchurl
-, ncurses
 , lib
 , dpkg
 , rsync
@@ -10,12 +9,9 @@
 , hwloc
 , zlib
 , autoPatchelfHook
-, symlinkJoin
 , libfabric
-, gcc
-, gcc7
+, gcc13
 , wrapCCWith
-, linuxHeaders
 , config
 }:
 
@@ -30,6 +26,8 @@
 # But this is an attempt to install the packages from the APT repo
 
 let
+
+  gcc = gcc13;
 
   v = {
     hpckit   = "2023.2.0";
@@ -321,6 +319,7 @@ let
       "intel-oneapi-compiler-fortran-common-${version}"
       "intel-oneapi-compiler-fortran-runtime-${version}"
     ];
+    dontCheckForBrokenSymlinks = true;
     # From https://aur.archlinux.org/packages/intel-oneapi-compiler:
     # - intel-oneapi-compiler-cpp-eclipse-cfg-2023.0.0-25370_all.deb
     # + intel-oneapi-compiler-dpcpp-cpp-2023.0.0-2023.0.0-25370_amd64.deb
@@ -413,7 +412,9 @@ let
         echo "-march=${config.oneapiArch}" >> $out/nix-support/cc-cflags-before
 
         # Need the gcc in the path
-        echo 'export "PATH=${mygcc}/bin:$PATH"' >> $out/nix-support/cc-wrapper-hook
+        # FIXME: We should find a better way to modify the PATH instead of using
+        # this ugly hack. See https://jungle.bsc.es/git/rarias/bscpkgs/issues/9
+        echo 'path_backup="${mygcc}/bin:$path_backup"' >> $out/nix-support/cc-wrapper-hook
 
         # Disable hardening by default
         echo "" > $out/nix-support/add-hardening.sh
