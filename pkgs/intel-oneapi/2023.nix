@@ -409,7 +409,7 @@ let
         echo "-L${cc}/lib" >> $out/nix-support/cc-ldflags
 
         # leave -mtune decided by the compiler (should be same as march), since ifx doesn't support -mtune=znver4
-        echo "-march=${config.oneapiArch}" >> $out/nix-support/cc-cflags-before
+        echo 'NIX_CFLAGS_COMPILE_BEFORE_${mygcc.suffixSalt}="$NIX_CFLAGS_COMPILE_BEFORE_${mygcc.suffixSalt} -march=''${NIX_ONEAPI_ARCH:-${config.oneapiArch}}"' >> $out/nix-support/add-flags.sh
 
         # Need the gcc in the path
         # FIXME: We should find a better way to modify the PATH instead of using
